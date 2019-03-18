@@ -25,11 +25,9 @@ class image_Viewer:
         if Image.encoding == 'rgb8':
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
 
-        print(self.image[0][0])
+        #print(self.image[0][0])
 
-        winname = "Test"
-        cv2.namedWindow(winname)
-        cv2.imshow(winname, self.image)
+        cv2.imshow("Summit_XL Cam Feed", self.image)
         cv2.waitKey(20)
 
 

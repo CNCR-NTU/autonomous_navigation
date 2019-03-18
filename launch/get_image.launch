@@ -1,0 +1,3 @@
+<launch> 
+    <node pkg="depth_field" type="get_image.py" name="get_image" output="screen" />
+</launch>

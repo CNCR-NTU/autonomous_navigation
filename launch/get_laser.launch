@@ -1,0 +1,3 @@
+<launch> 
+    <node pkg="depth_field" type="get_laser.py" name="get_laser" output="screen" />
+</launch>
