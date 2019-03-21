@@ -25,7 +25,10 @@ class ScanSegment:
         self.__minDist = None
         self.__avgDist = None
 
-    #Getters
+    #------------------------------------
+    #           Getters
+    #------------------------------------
+
     def getAngInc(self):
         "Returns angle increment between point."
 
@@ -56,7 +59,10 @@ class ScanSegment:
 
         return self.__minDist
 
-    #Setters
+    #------------------------------------
+    #               Setters
+    #------------------------------------
+
     def setAng(self,ang):
         "Sets value of angle increment."
 
@@ -81,7 +87,10 @@ class ScanSegment:
         self.__laserMax = max
 
         
-    #Other Functions
+    #------------------------------------
+    #           Functions
+    #------------------------------------
+    
     def totalScans(self):
         "Returns total number of scans"
 
