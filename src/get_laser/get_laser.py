@@ -43,7 +43,7 @@ class laser_scanner:
 
         self.__frontFoV = ScanSegment(-self.get_FoV(),self.get_FoV())
         self.__tolerance = tol/100.0
-
+    
         #Array of Laser values
         self.__WarnLVL = 0
 

@@ -88,8 +88,8 @@ class ScanSegment:
             self.__LaserRange.append(LaserPoint(val,self.__minAng+i*self.__angleIncrement))
             i += 1
 
-        self.__calcAbsRange()
-        self.__calcAbsDistances()
+        #self.__calcAbsRange()
+        #self.__calcAbsDistances()
 
     def setLaserMax(self,max):
         "Sets maximum laser value for refrence to prevent inf values."
