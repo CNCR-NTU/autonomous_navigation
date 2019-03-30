@@ -67,6 +67,11 @@ class ScanSegment:
         return self.__LaserRange
 
 
+    def getMaxDist(self):
+        "Returns Max distance of Laser"
+
+        return self.__laserMax
+
     #------------------------------------
     #               Setters
     #------------------------------------
@@ -83,9 +88,8 @@ class ScanSegment:
         self.__LaserRange = []
 
         
-
         for val in DistArr:
-            self.__LaserRange.append(LaserPoint(val,self.__minAng+i*self.__angleIncrement))
+            self.__LaserRange.append(LaserPoint(self.__minAng+i*self.__angleIncrement,val))
             i += 1
 
         #self.__calcAbsRange()

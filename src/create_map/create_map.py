@@ -32,8 +32,8 @@ class create_map:
 
         self.sc = self.ax.scatter(self.__xArr,self.__zArr,c='green',edgecolors='none')
         self.other = self.ax.scatter(self.laserX,self.laserZ,c='red',edgecolors='none')
-        plt.xlim(-10,10)
-        plt.ylim(-10,10)
+        plt.xlim(-30,30)
+        plt.ylim(-30,30)
 
         self.__Position = Position()
 
@@ -45,7 +45,7 @@ class create_map:
 
         while not rospy.is_shutdown():
             rospy.Subscriber(self.__positionTopic, ScanAtPosition, self.__callback)
-
+            
             self.__plotMap()
             #plt.waitforbuttonpress()
             #plt.show()
@@ -53,18 +53,24 @@ class create_map:
 
 
     def __callback(self,value):
+        
         self.__Position = value.pos
 
         self.__xArr.append(value.pos.xPos)
         self.__zArr.append(value.pos.zPos)
 
-        calcLaserCoord(value.LaserPoint,value.maxDist)
+        self.calcLaserCoord(value.scan,value.maxDist)
 
     
     def calcLaserCoord(self,laserList,maxDist):
-        for scan in maxDist:
+
+        for scan in laserList:
+            #print "Distance: {} \t Angle: {}".format(scan.distance,scan.angle)
+
             ang = scan.angle
-            if scan < maxDist:
+
+            if ang < maxDist:
+                #print "Ang: {}".format(ang)
                 if ang > 0:
                     if ang > math.pi/2: #Top RIght
                         pass
@@ -75,14 +81,17 @@ class create_map:
                         ang += math.pi/2
                     else: #bottom left
                         pass
-            #calc x
-            self.laserX.append(scan.distance*math.sin(ang))
-            #calc z
-            self.laserZ.append(scan.distance*math.cos(ang))
+
+                #print "Ang: {}".format(ang)
+                #calc x
+                self.laserX.append(scan.distance*math.sin(ang))
+                #calc z
+                self.laserZ.append(scan.distance*math.cos(ang))
 
     def __plotMap(self):
 
         self.sc.set_offsets(np.c_[self.__xArr,self.__zArr])
+        self.other.set_offsets(np.c_[self.laserX,self.laserZ])
         self.fig.canvas.draw_idle()
         plt.pause(0.01)
 

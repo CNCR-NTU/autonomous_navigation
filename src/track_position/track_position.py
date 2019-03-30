@@ -23,8 +23,8 @@ class position_tracker:
 
         self.__laserTopic = laserTopic
 
-        self.__xPos = 1.0
-        self.__zPos = 1.0
+        self.__xPos = 0.0
+        self.__zPos = 0.0
         self.__orientation = 0.0
 
         self.__laserScan = None
@@ -39,15 +39,13 @@ class position_tracker:
         msg.pos.xPos = self.__xPos
         msg.pos.zPos = self.__zPos
         msg.scan = self.__laserScan.getLaserRange()
-        print self.__laserScan.getLaserRange()
-        msg.maxDist = self.__laserScan.getLaserRange()
-
-        self.__xPos += 0.1
+        msg.maxDist = self.__laserScan.getMaxDist()
 
         self.__positionNode.publish(msg)
 
     def laserCallback(self,scan):
         self.__laserScan = ScanSegment(scan.angle_min,scan.angle_max,scan.range_max,scan.angle_increment)
+
         self.__laserScan.setLaserRange(scan.ranges)
         self.__track_pos()
 
