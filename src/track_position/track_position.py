@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-import rospy
-import roslib
-
-import std_msgs.msg
 import geometry_msgs.msg
+import roslib
+import rospy
 import sensor_msgs.msg
-from std_msgs.msg import Float32
+import std_msgs.msg
 from autonomous_navigation.msg import Position
+from std_msgs.msg import Float32
 
 POS_TOPIC = '/summit_xl_controller/position'
 
@@ -16,22 +15,21 @@ class position_tracker:
         self.__positionNode = rospy.Publisher(move, Position,queue_size=1)
         rospy.init_node('position_tracker', anonymous=True)
 
-        self.__xPos = Float32(float(0.0))
-        self.__zPos = Float32(float(0.0))
-        self.__orientation = Float32(float(0.0))
+        self.__xPos = 1.0
+        self.__zPos = 1.0
+        self.__orientation = 0.0
 
         self.__track_pos()
 
     def __track_pos(self):
-
+        
         msg = Position()
-        msg.orientation = 0.0
-        msg.xPos = 0.0
-        msg.zPos = 0.0
-
-        r = rospy.Rate(10) #10hz
-
+        r = rospy.Rate(30) #30hz
         while not rospy.is_shutdown():
+            msg.orientation = self.__orientation
+            msg.xPos = self.__xPos
+            msg.zPos = self.__zPos
+            self.__xPos += 0.1
             self.__positionNode.publish(msg)
             r.sleep()
 
@@ -40,7 +38,7 @@ class position_tracker:
 if __name__ == '__main__':
     try:
         PT = position_tracker(POS_TOPIC)
-        rospy.spin()
+        #rospy.spin()
 
     except rospy.ROSInterruptException:
                 pass

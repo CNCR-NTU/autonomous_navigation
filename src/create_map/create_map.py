@@ -20,18 +20,48 @@ class create_map:
 
         rospy.init_node('create_map', anonymous=True)
 
+
+        #Scatter Plot
+        self.fig, self.ax = plt.subplots()
+
+        self.__xArr,self.__zArr = [],[]
+
+        self.sc = self.ax.scatter(self.__xArr,self.__zArr,c='green',edgecolors='none')
+        plt.xlim(-10,10)
+        plt.ylim(-10,10)
+
+        self.__Position = Position()
+
         self.__getPosition()
 
-    
+ 
     def __getPosition(self):
-        rospy.Subscriber(self.__positionTopic, Position, self.__callback)
-        rospy.spin()
+        rate = rospy.Rate(30) #30hz
+
+        while not rospy.is_shutdown():
+            rospy.Subscriber(self.__positionTopic, Position, self.__callback)
+
+            self.__plotMap()
+            rate.sleep()
+
+
 
     def __callback(self,value):
-        print "\nx: {}".format(value.xPos)
-        print "z: {}".format(value.zPos)
-        print "orientation: {}".format(value.orientation)
-        print "-----------------------------------------"
+        self.__Position = value
+
+        self.__xArr.append(value.xPos)
+        self.__zArr.append(value.zPos)
+
+        
+    def __plotMap(self):
+
+        colors = ("green","red")
+        groups = ("Summit_XL Path","Detected Objects")
+
+        self.sc.set_offsets(np.c_[self.__xArr,self.__zArr])
+        self.fig.canvas.draw_idle()
+        plt.pause(0.1)
+
 
 
 if __name__ == '__main__':
@@ -40,18 +70,3 @@ if __name__ == '__main__':
 
     except rospy.ROSInterruptException:
                 pass
-
-#fig, ax = plt.subplots()
-#x, y = [],[]
-#sc = ax.scatter(x,y)
-#plt.xlim(0,10)
-#plt.ylim(0,10)
-
-#def animate(i):
-#    x.append(np.random.rand(1)*10)
-#    y.append(np.random.rand(1)*10)
-#    sc.set_offsets(np.c_[x,y])
-
-#ani = matplotlib.animation.FuncAnimation(fig, animate, 
- #               frames=2, interval=100, repeat=True) 
-#plt.show()
