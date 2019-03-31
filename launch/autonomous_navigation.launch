@@ -1,0 +1,4 @@
+<launch> 
+    <node pkg="autonomous_navigation" type="get_laser.py" name="get_laser" output="screen" />
+    <node pkg="autonomous_navigation" type="create_map.py" name="create_map" output="screen" />
+</launch>

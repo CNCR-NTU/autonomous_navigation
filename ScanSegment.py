@@ -135,7 +135,7 @@ class ScanSegment:
         self.__AbsRange = []
 
         for scan in self.__LaserRange:
-            self.__AbsRange.append(math.cos(scan.angle)*scan.distance)
+            self.__AbsRange.append(scan.Abs_Dist())
     
     def __calcAbsDistances(self):
         "Calculates average absolute distance value and minimum absolute distance over range."
@@ -143,16 +143,14 @@ class ScanSegment:
         total = 0
         count = 0
         self.__minDist = self.__laserMax
-        print self.__LaserRange
-        for scan in self.__LaserRange:
-            scanAbs = math.cos(scan.angle)*scan.distance
 
-            if scanAbs < self.__laserMax:
-                total += scanAbs
+        for scan in self.__LaserRange:
+            if scan.Abs_Dist() < self.__laserMax:
+                total += scan.Abs_Dist()
                 count += 1
 
-                if scanAbs < self.__minDist:
-                    self.__minDist = scanAbs
+                if scan.Abs_Dist() < self.__minDist:
+                    self.__minDist = scan.Abs_Dist()
 
         if count != 0:
             self.__avgDist = total/count

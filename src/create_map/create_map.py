@@ -8,11 +8,12 @@ import roslib
 
 import math
 
-
 import geometry_msgs.msg
 import sensor_msgs.msg
 from autonomous_navigation.msg import Position
 from autonomous_navigation.msg import ScanAtPosition
+
+import datetime
 
 POS_TOPIC = '/summit_xl_controller/position'
 
@@ -41,19 +42,15 @@ class create_map:
 
  
     def __getPosition(self):
-        rate = rospy.Rate(30) #30hz
 
-        while not rospy.is_shutdown():
-            rospy.Subscriber(self.__positionTopic, ScanAtPosition, self.__callback)
-            
-            self.__plotMap()
-            #plt.waitforbuttonpress()
-            #plt.show()
-            rate.sleep()
-
+        rospy.Subscriber(self.__positionTopic, ScanAtPosition, self.__callback,queue_size=1)
+        
+        plt.show(block=True)
 
     def __callback(self,value):
-        
+
+        print "Recieved at: {}".format(datetime.datetime.now())
+
         self.__Position = value.pos
 
         self.__xArr.append(value.pos.xPos)
@@ -61,35 +58,39 @@ class create_map:
 
         self.calcLaserCoord(value.scan,value.maxDist)
 
+        self.__plotMap()
+
     
     def calcLaserCoord(self,laserList,maxDist):
+        print len(laserList)
 
-        for scan in laserList:
-            #print "Distance: {} \t Angle: {}".format(scan.distance,scan.angle)
+        x,z = 0,0
 
+        for scan in laserList:        
             ang = scan.angle
 
-            if ang < maxDist:
-                #print "Ang: {}".format(ang)
-                if ang > 0:
-                    if ang > math.pi/2: #Top RIght
-                        pass
-                    else: # Bottom RIght
-                        ang -= math.pi/2
-                else:
-                    if ang < -(math.pi/2): # Top left
-                        ang += math.pi/2
-                    else: #bottom left
-                        pass
+            if scan.distance < maxDist:
+                if abs(ang) <= math.pi/2:    #Top Quadrants
+                    x = math.sin(ang)*scan.distance
+                    z = math.cos(ang)*scan.distance
+                else:    #Bottom Quadrants
+                    if ang > 0:
+                        #BR
+                        x = -(math.sin(ang)*scan.distance)
+                        z = (math.cos(ang)*scan.distance)
+                    else:
+                        #BL
+                        x = (math.sin(ang)*scan.distance)
+                        z = -(math.cos(ang)*scan.distance)
 
-                #print "Ang: {}".format(ang)
+
                 #calc x
-                self.laserX.append(scan.distance*math.sin(ang))
+                self.laserX.append(x)
                 #calc z
-                self.laserZ.append(scan.distance*math.cos(ang))
+                self.laserZ.append(z)
+
 
     def __plotMap(self):
-
         self.sc.set_offsets(np.c_[self.__xArr,self.__zArr])
         self.other.set_offsets(np.c_[self.laserX,self.laserZ])
         self.fig.canvas.draw_idle()

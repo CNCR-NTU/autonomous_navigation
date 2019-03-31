@@ -6,10 +6,9 @@ import sensor_msgs.msg
 import std_msgs.msg
 from autonomous_navigation.msg import Position
 from autonomous_navigation.msg import ScanAtPosition
-from std_msgs.msg import Float32
+import math
 
 from ScanSegment import ScanSegment
-
 
 POS_TOPIC = '/summit_xl_controller/position'
 LASER_TOPIC = '/summit_xl_a/front_laser/scan'
@@ -34,17 +33,19 @@ class position_tracker:
     def __track_pos(self):
         
         msg = ScanAtPosition()
-
+        msg.header.stamp = rospy.Time.now()
         msg.pos.orientation = self.__orientation
         msg.pos.xPos = self.__xPos
         msg.pos.zPos = self.__zPos
         msg.scan = self.__laserScan.getLaserRange()
         msg.maxDist = self.__laserScan.getMaxDist()
 
+        rate = rospy.Rate(0.5) #Every 2 seconds
         self.__positionNode.publish(msg)
+        rate.sleep()
 
     def laserCallback(self,scan):
-        self.__laserScan = ScanSegment(scan.angle_min,scan.angle_max,scan.range_max,scan.angle_increment)
+        self.__laserScan = ScanSegment(scan.angle_min,scan.angle_max,scan.range_max,scan.angle_increment,llinc=math.radians(1))
 
         self.__laserScan.setLaserRange(scan.ranges)
         self.__track_pos()
