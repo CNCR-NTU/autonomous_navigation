@@ -4,7 +4,7 @@ class WarnLVL:
     """Structure for warnings, contains the warning, the colour to print to
      console and the speed of the system associated with this warning level."""
 
-    def __init__(self,CC,V,war):
+    def __init__(self, CC, V, war):
         self.__ConsoleColour = CC
         self.__Velocity = V
         self.__Warning = war
@@ -15,5 +15,4 @@ class WarnLVL:
 
     def get_velocity(self):
         "Returns velocity."
-        return self.__Velocity 
-    
+        return self.__Velocity
