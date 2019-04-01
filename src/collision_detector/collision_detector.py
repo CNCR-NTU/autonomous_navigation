@@ -11,8 +11,7 @@ import sensor_msgs.msg
 from warning_level import WarnLVL
 from ScanSegment import ScanSegment
 
-#LASER_TOPIC = "/hokuyo_base/scan"
-LASER_TOPIC = '/summit_xl_a/front_laser/scan'
+LASER_TOPIC = "/hokuyo_base/scan"
 VELOCITY_TOPIC = "/summit_xl_control/cmd_vel"
 
 # Level of tolerance for anomalies (%)

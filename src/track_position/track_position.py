@@ -11,7 +11,7 @@ import math
 from ScanSegment import ScanSegment
 
 POS_TOPIC = '/summit_xl_controller/position'
-LASER_TOPIC = '/summit_xl_a/front_laser/scan'
+LASER_TOPIC = "/hokuyo_base/scan"
 
 
 class position_tracker:
@@ -23,9 +23,7 @@ class position_tracker:
 
         self.__laserTopic = laserTopic
 
-        self.__xPos = 0.0
-        self.__zPos = 0.0
-        self.__orientation = 0.0
+        self.__position = Position(0.0,0.0,0.0)
 
         self.__laserScan = None
 
@@ -35,9 +33,7 @@ class position_tracker:
 
         msg = ScanAtPosition()
         msg.header.stamp = rospy.Time.now()
-        msg.pos.orientation = self.__orientation
-        msg.pos.xPos = self.__xPos
-        msg.pos.zPos = self.__zPos
+        msg.pos = self.__position
         msg.scan = self.__laserScan.getLaserRange()
         msg.maxDist = self.__laserScan.getMaxDist()
 
@@ -56,7 +52,7 @@ class position_tracker:
         "Subscribes to the LaserScan topic and calls the callback"
 
         rospy.Subscriber(self.__laserTopic,
-                         sensor_msgs.msg.LaserScan, self.laserCallback)
+                         sensor_msgs.msg.LaserScan, self.laserCallback,queue_size=1)
         rospy.spin()
 
 

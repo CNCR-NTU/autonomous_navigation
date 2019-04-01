@@ -71,6 +71,9 @@ class create_map:
     def __calcLaserCoord(self, laserList, maxDist):
         """Calculates all coordinates of LaserScans given their distance and angle.
         """
+
+        self.__laserX, self.__laserZ = [], []
+
         x, z = 0, 0
 
         for scan in laserList:
@@ -100,8 +103,8 @@ class create_map:
         plt.pause(0.01)
 
     def __setLimits(self):
-        plt.xlim(-30, 30)
-        plt.ylim(-30, 30)
+        plt.xlim(-8, 8)
+        plt.ylim(-8, 8)
 
 if __name__ == '__main__':
     try:
