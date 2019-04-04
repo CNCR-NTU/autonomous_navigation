@@ -1,3 +1,0 @@
-<launch> 
-    <node pkg="autonomous_navigation" type="track_position.py" name="track_position" output="screen" />
-</launch>

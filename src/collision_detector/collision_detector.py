@@ -1,18 +1,35 @@
 #!/usr/bin/env python
+
+#==============================
+#     Import Libraries
+#==============================
+
 import rospy
 import roslib
 
 import math
 import numpy
 
-import geometry_msgs.msg
-import sensor_msgs.msg
-
 from warning_level import WarnLVL
 from ScanSegment import ScanSegment
 
+#==============================
+#     Import Messages
+#==============================
+
+import geometry_msgs.msg
+import sensor_msgs.msg
+
+#==============================
+#     Set Topic Variables 
+#==============================
+
 LASER_TOPIC = "/hokuyo_base/scan"
 VELOCITY_TOPIC = "/summit_xl_control/cmd_vel"
+
+#==============================
+#   Set Collision Variables 
+#==============================
 
 # Level of tolerance for anomalies (%)
 LOT = 3
@@ -21,6 +38,9 @@ LOT = 3
 WARN_DISTANCE = 0.75
 STOP_DISTANCE = 0.3
 
+#==============================
+#   collision_detector class 
+#==============================
 
 class collision_detector:
     """ A class used for processing information from a ROS topic LaserScan.
