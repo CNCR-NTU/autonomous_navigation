@@ -58,13 +58,17 @@ class create_map:
 
         # Create plots
         self.__summitPoints = self.__scatPlot.scatter(
-            self.__xArr, self.__zArr, c='green', edgecolors='none')
+            self.__xArr, self.__zArr, c='green', edgecolors='none',s=50)
 
         self.__laserPoints = self.__scatPlot.scatter(
             self.__laserX, self.__laserZ, c='red', edgecolors='none')
 
         self.__goalPoints = self.__scatPlot.scatter(
-            self.__goalX,self.__goalZ,c='blue',edgecolors='none')
+            self.__goalX,self.__goalZ,c='blue',edgecolors='none',s=50)
+
+        #Plot Annotations
+        self.__summitAnnotation = None
+        self.__goalAnnotation = None
 
         # Set Limits
         self.__setLimits(8)
@@ -130,9 +134,20 @@ class create_map:
     def __plotMap(self):
         """Plots all points from lists onto a scatter graph."""
 
+        if self.__summitAnnotation is not None:
+            self.__summitAnnotation.remove()
+            self.__goalAnnotation.remove()
+
+
+
         self.__summitPoints.set_offsets(np.c_[self.__xArr, self.__zArr])
+        self.__summitAnnotation = self.__scatPlot.annotate("Summit",(self.__xArr[0],self.__zArr[0]))
+
         self.__laserPoints.set_offsets(np.c_[self.__laserX, self.__laserZ])
+
+
         self.__goalPoints.set_offsets(np.c_[self.__goalX, self.__goalZ])
+        self.__goalAnnotation = self.__scatPlot.annotate("Goal",(self.__goalX[0],self.__goalZ[0]))
 
         self.__fig.canvas.draw_idle()
         plt.pause(0.01)
