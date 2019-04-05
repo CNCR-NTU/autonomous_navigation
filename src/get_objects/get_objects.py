@@ -32,7 +32,7 @@ LASER_TOPIC = "/hokuyo_base/scan"
 #==============================
 
 class get_objects:
-    """Subscribes to topics to obtain and group togetehr the data required for plotting
+    """Subscribes to topics to obtain and group together the data required for plotting
     the Scatter Plot
     """
 
