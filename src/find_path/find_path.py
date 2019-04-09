@@ -101,6 +101,7 @@ class aStar:
 
 class Node:
     
+    
 
 if __name__ == '__main__':
     try:
