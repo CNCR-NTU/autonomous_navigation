@@ -1,0 +1,4 @@
+<launch> 
+    <node pkg="autonomous_navigation" type="vicon_tracker.py" name="vicon_tracker" output="screen" />
+    <node pkg="autonomous_navigation" type="nav2goal.py" name="nav2goal" output="screen" />
+</launch>

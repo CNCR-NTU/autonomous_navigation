@@ -64,12 +64,15 @@ class vicon_tracker:
         self.SummitPositionNode = rospy.Publisher(positionTopic, Position, queue_size=1)
         self.GoalPositionNode = rospy.Publisher(goalTopic, Position, queue_size=1)
 
+        print "\n\n\033[1mListening to port: {} on {} for VICON tracker information...\033[0m".format(port,ip)
+
         self.__get_data()
 
 
     def __get_data(self):
         """Loops until closed. Reads information packets from IP address, turns information into
         ROS Messages to be published"""
+        rate = rospy.Rate(30)
 
         while not rospy.is_shutdown():
             data, addr = self.__sock.recvfrom(1024) # buffer size is 1024 bytes
@@ -78,7 +81,7 @@ class vicon_tracker:
             #Get Object Names from Data
             object1name = data[8:14]
             object2name = data[83:87]
-           
+
             if object1name == "Summit":
                 #Unpack Variables
                 xPos = (struct.unpack_from('d',data,32))[0]
@@ -95,6 +98,8 @@ class vicon_tracker:
 
                 #Send Position Message
                 self.GoalPositionNode.publish(Position(0.0,xPos,zPos))
+
+            rate.sleep()
 
 if __name__ == '__main__':
     try:

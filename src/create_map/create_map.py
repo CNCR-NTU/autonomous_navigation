@@ -92,7 +92,6 @@ class create_map:
     def __goalCallback(self,value):
         self.__goalX,self.__goalZ = [],[]
 
-
         self.__goalX.append(self.__Position.xPos + abs(self.__Position.xPos - value.xPos)*(-1 if self.__invertX else 1))
         self.__goalZ.append(self.__Position.zPos + abs(self.__Position.zPos - value.zPos)*(-1 if self.__invertY else 1))
 
@@ -109,6 +108,7 @@ class create_map:
 
         self.__plotMap()
 
+
     def __calcLaserCoord(self, laserList, maxDist):
         """Calculates all coordinates of LaserScans given their distance and angle.
         """
@@ -117,7 +117,11 @@ class create_map:
         self.__setLimits(maxDist)
 
         for scan in laserList:
-            ang = scan.angle + self.__Position.orientation
+            ang = scan.angle + self.__Position.orientation# + math.pi/2
+
+            #if ang < -math.pi:
+            #    ang = 2*math.pi - ang
+
             dist = scan.distance
             if dist < maxDist:
                 dist *= 1000.0 #Convert to mm
