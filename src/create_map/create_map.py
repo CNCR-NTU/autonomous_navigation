@@ -35,7 +35,7 @@ class create_map:
     Plot enables localisation features of the system.
     """
 
-    def __init__(self, POS_TOPIC,GOAL_TOPIC):
+    def __init__(self, POS_TOPIC,GOAL_TOPIC,invertX = False,invertY = False):
         """Creates instance of create_map class.
         POS_TOPIC = Topic of msg type ScanAtPosition.
         ScanAtPosition msg contains a list of scans at a given x,z coord
@@ -56,6 +56,10 @@ class create_map:
         self.__laserX, self.__laserZ = [], []
         self.__goalX,self.__goalZ = [],[]
 
+        #Inverters for Plot
+        self.__invertX = invertX
+        self.__invertY = invertY
+  
         # Create plots
         self.__summitPoints = self.__scatPlot.scatter(
             self.__xArr, self.__zArr, c='green', edgecolors='none',s=50)
@@ -89,8 +93,8 @@ class create_map:
         self.__goalX,self.__goalZ = [],[]
 
 
-        self.__goalX.append(self.__Position.xPos - abs(self.__Position.xPos - value.xPos))
-        self.__goalZ.append(self.__Position.zPos + abs(self.__Position.zPos - value.zPos))
+        self.__goalX.append(self.__Position.xPos + abs(self.__Position.xPos - value.xPos)*(-1 if self.__invertX else 1))
+        self.__goalZ.append(self.__Position.zPos + abs(self.__Position.zPos - value.zPos)*(-1 if self.__invertY else 1))
 
 
     def __callback(self, value):
@@ -116,20 +120,20 @@ class create_map:
             ang = scan.angle + self.__Position.orientation
             dist = scan.distance
             if dist < maxDist:
-                dist *= 1000.0
+                dist *= 1000.0 #Convert to mm
                 if abs(ang) <= math.pi/2:
                     x = math.sin(ang)*dist
                     z = math.cos(ang)*dist
                 else:
                     if ang > 0:
-                        x = -(math.sin(ang)*dist)
+                        x = (math.sin(ang)*dist)
                         z = (math.cos(ang)*dist)
                     else:
                         x = (math.sin(ang)*dist)
                         z = -(math.cos(ang)*dist)
 
-                self.__laserX.append(self.__Position.xPos - x)
-                self.__laserZ.append(self.__Position.zPos + z)
+                self.__laserX.append(self.__Position.xPos + x*(-1 if self.__invertX else 1))
+                self.__laserZ.append(self.__Position.zPos + z*(-1 if self.__invertY else 1))
 
     def __plotMap(self):
         """Plots all points from lists onto a scatter graph."""
@@ -160,7 +164,7 @@ class create_map:
 
 if __name__ == '__main__':
     try:
-        cm = create_map(POS_TOPIC,GOAL_TOPIC)
+        cm = create_map(POS_TOPIC,GOAL_TOPIC,invertX=True)
 
     except rospy.ROSInterruptException:
         pass
