@@ -66,7 +66,7 @@ class get_objects:
                 ,self.__laserScan.getMaxDist())
 
 
-        rate = rospy.Rate(10)  # Every 0.1 second(s)
+        rate = rospy.Rate(30)  # Every 0.1 second(s)
         self.__positionNode.publish(msg)
         rate.sleep()
 

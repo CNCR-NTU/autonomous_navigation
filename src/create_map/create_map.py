@@ -41,86 +41,83 @@ class create_map:
         ScanAtPosition msg contains a list of scans at a given x,z coord
         """
 
-        self.__positionTopic = POS_TOPIC
-        self.__goalTopic = GOAL_TOPIC
+        self._positionTopic = POS_TOPIC
+        self._goalTopic = GOAL_TOPIC
         # Stores position of Robot
-        self.__Position = Position()
-        self.__goalPosition = Position()
+        self._Position = Position(0.0,0.0,0.0)
+        self._goalPosition = Position()
 
         rospy.init_node('create_map', anonymous=True)
 
         # Scatter Plot
-        self.__fig, self.__scatPlot = plt.subplots()
+        self._fig, self._scatPlot = plt.subplots()
         # Lists for storing data
-        self.__xArr, self.__zArr = [], []
-        self.__laserX, self.__laserZ = [], []
-        self.__goalX,self.__goalZ = [],[]
+        self._xArr, self._zArr = [], []
+        self._laserX, self._laserZ = [], []
+        self._goalX,self._goalZ = [],[]
 
         #Inverters for Plot
-        self.__invertX = invertX
-        self.__invertY = invertY
+        self._invertX = invertX
+        self._invertY = invertY
   
         # Create plots
-        self.__summitPoints = self.__scatPlot.scatter(
-            self.__xArr, self.__zArr, c='green', edgecolors='none',s=50)
+        self._summitPoints = self._scatPlot.scatter(
+            self._xArr, self._zArr, c='green', edgecolors='none',s=100,marker="s")
 
-        self.__laserPoints = self.__scatPlot.scatter(
-            self.__laserX, self.__laserZ, c='red', edgecolors='none')
+        self._laserPoints = self._scatPlot.scatter(
+            self._laserX, self._laserZ, c='red', edgecolors='none')
 
-        self.__goalPoints = self.__scatPlot.scatter(
-            self.__goalX,self.__goalZ,c='blue',edgecolors='none',s=50)
+        self._goalPoints = self._scatPlot.scatter(
+            self._goalX,self._goalZ,c='blue',edgecolors='none',s=150,marker="*")
 
         #Plot Annotations
-        self.__summitAnnotation = None
-        self.__goalAnnotation = None
+        self._summitAnnotation = None
+        self._goalAnnotation = None
 
         # Set Limits
-        self.__setLimits(8)
+        self._setLimits(8)
 
-        self.__getPosition()
+        self._getPosition()
 
-    def __getPosition(self):
+    def _getPosition(self):
         """Gets latest message from position topic, calls callback with msg.
         Node keeps subsribing due to plot loop."""
-        rospy.Subscriber(self.__goalTopic, Position,self.__goalCallback,queue_size=1)
+        rospy.Subscriber(self._goalTopic, Position,self._goalCallback,queue_size=1)
 
-        rospy.Subscriber(self.__positionTopic, ScanAtPosition,
-                         self.__callback, queue_size=1)
+        rospy.Subscriber(self._positionTopic, ScanAtPosition,
+                         self._callback, queue_size=1)
 
         plt.show(block=True)
 
-    def __goalCallback(self,value):
-        self.__goalX,self.__goalZ = [],[]
+    def _goalCallback(self,value):
+        self._goalX,self._goalZ = [],[]
 
-        self.__goalX.append(self.__Position.xPos + abs(self.__Position.xPos - value.xPos)*(-1 if self.__invertX else 1))
-        self.__goalZ.append(self.__Position.zPos + abs(self.__Position.zPos - value.zPos)*(-1 if self.__invertY else 1))
+        self._goalX.append(self._Position.xPos + abs(self._Position.xPos - value.xPos)*(-1 if self._invertX else 1))
+        self._goalZ.append(self._Position.zPos + abs(self._Position.zPos - value.zPos)*(-1 if self._invertY else 1))
 
 
-    def __callback(self, value):
+    def _callback(self, value):
         """Processes information from ROS msg. Sets position of Robot """
-        self.__Position = value.pos
+        self._Position = value.pos
 
-        self.__xArr, self.__zArr = [], []
-        self.__xArr.append(value.pos.xPos)
-        self.__zArr.append(value.pos.zPos)
+        self._xArr, self._zArr = [], []
+        self._xArr.append(value.pos.xPos)
+        self._zArr.append(value.pos.zPos)
 
-        self.__calcLaserCoord(value.scan, value.maxDist)
+        self._calcLaserCoord(value.scan, value.maxDist)
 
-        self.__plotMap()
+        self._plotMap()
 
 
-    def __calcLaserCoord(self, laserList, maxDist):
+    def _calcLaserCoord(self, laserList, maxDist):
         """Calculates all coordinates of LaserScans given their distance and angle.
         """
-        self.__laserX, self.__laserZ = [], []
+        self._laserX, self._laserZ = [], []
 
-        self.__setLimits(maxDist)
+        self._setLimits(maxDist)
 
         for scan in laserList:
-            ang = scan.angle + self.__Position.orientation# + math.pi/2
-
-            #if ang < -math.pi:
-            #    ang = 2*math.pi - ang
+            ang = scan.angle + self._Position.orientation
 
             dist = scan.distance
             if dist < maxDist:
@@ -136,35 +133,35 @@ class create_map:
                         x = (math.sin(ang)*dist)
                         z = -(math.cos(ang)*dist)
 
-                self.__laserX.append(self.__Position.xPos + x*(-1 if self.__invertX else 1))
-                self.__laserZ.append(self.__Position.zPos + z*(-1 if self.__invertY else 1))
+                self._laserX.append(self._Position.xPos + x*(-1 if self._invertX else 1))
+                self._laserZ.append(self._Position.zPos + z*(-1 if self._invertY else 1))
 
-    def __plotMap(self):
+    def _plotMap(self):
         """Plots all points from lists onto a scatter graph."""
 
-        if self.__summitAnnotation is not None:
-            self.__summitAnnotation.remove()
-            self.__goalAnnotation.remove()
+        if self._summitAnnotation is not None:
+            self._summitAnnotation.remove()
+            self._goalAnnotation.remove()
 
 
 
-        self.__summitPoints.set_offsets(np.c_[self.__xArr, self.__zArr])
-        self.__summitAnnotation = self.__scatPlot.annotate("Summit",(self.__xArr[0],self.__zArr[0]))
+        self._summitPoints.set_offsets(np.c_[self._xArr, self._zArr])
+        self._summitAnnotation = self._scatPlot.annotate("Summit",(self._xArr[0],self._zArr[0]))
 
-        self.__laserPoints.set_offsets(np.c_[self.__laserX, self.__laserZ])
+        self._laserPoints.set_offsets(np.c_[self._laserX, self._laserZ])
 
 
-        self.__goalPoints.set_offsets(np.c_[self.__goalX, self.__goalZ])
-        self.__goalAnnotation = self.__scatPlot.annotate("Goal",(self.__goalX[0],self.__goalZ[0]))
+        self._goalPoints.set_offsets(np.c_[self._goalX, self._goalZ])
+        self._goalAnnotation = self._scatPlot.annotate("Goal",(self._goalX[0],self._goalZ[0]))
 
-        self.__fig.canvas.draw_idle()
+        self._fig.canvas.draw_idle()
         plt.pause(0.01)
 
-    def __setLimits(self,dist):
+    def _setLimits(self,dist):
         """Set limits of plots based on position of Robot"""
         
-        plt.xlim(self.__Position.xPos - dist*1000.0, self.__Position.xPos + dist*1000.0)
-        plt.ylim(self.__Position.zPos - dist*1000.0, self.__Position.zPos + dist*1000.0)
+        plt.xlim(self._Position.xPos - dist*1000.0, self._Position.xPos + dist*1000.0)
+        plt.ylim(self._Position.zPos - dist*1000.0, self._Position.zPos + dist*1000.0)
 
 if __name__ == '__main__':
     try:

@@ -26,7 +26,7 @@ from autonomous_navigation.msg import Position
 #       Set IP Address 
 #==============================
 
-UDP_IP = "192.168.2.110"
+UDP_IP = "192.168.2.108"
 UDP_PORT = 51001
 
 #==============================

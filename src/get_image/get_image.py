@@ -3,15 +3,17 @@ import rospy
 import roslib
 
 import geometry_msgs.msg
-import sensor_msgs.msg
+from sensor_msgs.msg import Image
 
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 
 import numpy as np
 
-DEPTH_SENSOR_TOPIC = '/orbbec_astra/depth/image'
-RGB_SENSOR_TOPIC = '/orbbec_astra/rgb/image_raw'
+import message_filters
+
+DEPTH_SENSOR_TOPIC = '/ai/depth'
+RGB_SENSOR_TOPIC = '/ai/rgb'
 
 
 class image_Viewer:
@@ -19,62 +21,54 @@ class image_Viewer:
     def __init__(self, RGB,DEPTH):
 
         #Topics for camera feeds
-        self.__rgbTopic = RGB
-        self.__depthTopic = DEPTH
+        self._rgbTopic = RGB
+        self._depthTopic = DEPTH
 
         #Numpy arrays for storing camera data
-        self.__rgbArr = None
-        self.__depthArr = None
+        self._rgbArr = None
+        self._depthArr = None
 
         #OpenCV bridge
-        self.__BRIDGE = CvBridge()
+        self._BRIDGE = CvBridge()
 
-        self.__get_images()
-
-    def __rgbCallback(self, Image):
-        self.__rgbArr = self.__BRIDGE.imgmsg_to_cv2(Image, Image.encoding)
-
-        #print Image.encoding
-
-        #self.__rgbArr = cv2.cvtColor(self.__rgbArr, cv2.COLOR_BGR2RGB)
-
-
-
-    def __depthCallback(self,Image):
-
-        self.__depthArr = self.__BRIDGE.imgmsg_to_cv2(Image, Image.encoding)
-        #print Image.encoding
-        self.__depthArr = cv2.cvtColor(self.__depthArr, cv2.COLOR_GRAY2BGR)
-
-        #if Image.encoding == 'rgb8':
-            #self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-        self.__combineArrays()
-        
-        
-
-    def __combineArrays(self):
-        #Combine into single image
-
-        image = np.hstack((self.__rgbArr,self.__depthArr))
-
-        self.__showImage(image)
-
-    def __showImage(self,image):
-        cv2.imshow("Summit_XL Cam Feed", image)
-        cv2.waitKey(20)
+        self._get_images()
 
  
-    def __get_images(self):
+        
+    def callback(self,rgb,depth):
+        while not rospy.is_shutdown():
+            try:
+                rgbImage = self._BRIDGE.imgmsg_to_cv2(rgb, "bgr8")
+
+                depthImage = self._BRIDGE.imgmsg_to_cv2(depth, "32FC1")
+                depthImage = cv2.cvtColor(depthImage, cv2.COLOR_GRAY2BGR)
+
+                images1 = np.hstack((rgbImage, depthImage))
+                cv2.imshow("AI - RGB and depth map", depthImage)
+
+            except rospy.ROSInterruptException:
+                print("Shuting down Enhanced Grasping!")
+            except IOError:
+                print("Shuting down Enhanced Grasping!")
+
+
+
+    def _get_images(self):
         rospy.init_node('image', anonymous=True)
-        rospy.Subscriber(self.__rgbTopic, sensor_msgs.msg.Image, self.__rgbCallback)
-        rospy.Subscriber(self.__depthTopic, sensor_msgs.msg.Image, self.__depthCallback)
+
+        rgbImage=message_filters.Subscriber(self._rgbTopic, Image)
+
+        depthImage=message_filters.Subscriber(self._depthTopic, Image)
+        
+        ts = message_filters.ApproximateTimeSynchronizer([rgbImage, depthImage], 10, 0.1)
+        ts.registerCallback(self.callback)
+        rospy.spin()
+
 
 
 if __name__ == '__main__':
     try:
         I = image_Viewer(RGB_SENSOR_TOPIC,DEPTH_SENSOR_TOPIC)
-
-        rospy.spin()
 
     except rospy.ROSInterruptException:
         pass
