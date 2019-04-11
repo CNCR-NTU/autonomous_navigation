@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from _future_ import print_function
+from __future__ import print_function
 
 # -*- coding: utf-8 -*-
 """
@@ -30,17 +30,17 @@ website: https://www.ntu.ac.uk/research/groups-and-centres/groups/computational-
 # ===============================================================================
 # PROGRAM METADATA
 # ===============================================================================
-_author_ = 'Pedro Machado'
-_contact_ = 'pedro.baptistamachado@ntu.ac.uk'
-_copyright_ = 'Enhanced grasping project can not be copied and/or distributed \
+__author__ = 'Pedro Machado'
+__contact__ = 'pedro.baptistamachado@ntu.ac.uk'
+__copyright__ = 'Enhanced grasping project can not be copied and/or distributed \
 without the express permission of Prof. Martin McGinnity <martin.mcginnity@ntu.ac.uk'
-_license_ = '2019 (C) CNCR@NTU, All rights reserved'
-_date_ = '13/02/2019'
-_version_ = '0.1'
-_file__name__ = 'getImage.py'
-_description_ = 'image subscriber'
-_compatibility_ = "Python 2"
-_platforms_ = "Sawyer and AR10 hand"
+__license__ = '2019 (C) CNCR@NTU, All rights reserved'
+__date__ = '13/02/2019'
+__version__ = '0.1'
+__file__name__ = 'getImage.py'
+__description__ = 'image subscriber'
+__compatibility__ = "Python 2"
+__platforms__ = "Sawyer and AR10 hand"
 
 # ===============================================================================
 # IMPORT STATEMENTS
@@ -64,7 +64,7 @@ global recordFlag, images_counter
 images_counter = 1001
 recordFlag = False
 
-FOLDER = os.path.dirname(os.path.realpath(_file_)) + "/capturedImages/"
+FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/capturedImages/"
 # ===============================================================================
 # METHODS
 # ===============================================================================
