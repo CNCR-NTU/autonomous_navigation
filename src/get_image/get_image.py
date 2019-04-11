@@ -1,74 +1,131 @@
 #!/usr/bin/env python
-import rospy
-import roslib
 
-import geometry_msgs.msg
-from sensor_msgs.msg import Image
+from _future_ import print_function
 
-import cv2
-from cv_bridge import CvBridge, CvBridgeError
+# -*- coding: utf-8 -*-
+"""
+:ABSTRACT:
+This script is part of the Enhanced grasp project
 
+:REQUIRES:
+
+:
+:AUTHOR:  Pedro Machado
+:ORGANIZATION: Nottingham Trent University
+:CONTACT: pedro.baptistamachado@ntu.ac.uk
+:SINCE: <date>
+:VERSION: 0.1
+
+This file is part of <project> project.
+the Robot 2 Robot interaction project can not be copied and/or distributed without the express
+permission of Prof. Martin McGinnity <martin.mcginnity@ntu.ac.uk>
+
+Copyright (C) 2019 All rights reserved, Nottingham Trent University
+Computational Neuroscience and Cognitive Robotics Laboratory
+email:  pedro.baptistamachado@ntu.ac.uk
+website: https://www.ntu.ac.uk/research/groups-and-centres/groups/computational-neuroscience-and-cognitive-robotics-laboratory
+
+
+"""
+# ===============================================================================
+# PROGRAM METADATA
+# ===============================================================================
+_author_ = 'Pedro Machado'
+_contact_ = 'pedro.baptistamachado@ntu.ac.uk'
+_copyright_ = 'Enhanced grasping project can not be copied and/or distributed \
+without the express permission of Prof. Martin McGinnity <martin.mcginnity@ntu.ac.uk'
+_license_ = '2019 (C) CNCR@NTU, All rights reserved'
+_date_ = '13/02/2019'
+_version_ = '0.1'
+_file__name__ = 'getImage.py'
+_description_ = 'image subscriber'
+_compatibility_ = "Python 2"
+_platforms_ = "Sawyer and AR10 hand"
+
+# ===============================================================================
+# IMPORT STATEMENTS
+# ===============================================================================
+from rospy_tutorials.msg import Floats
+from rospy.numpy_msg import numpy_msg
+from std_msgs.msg import String
+import os
 import numpy as np
-
+import time
+import cv2
+import rospy
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 import message_filters
 
-DEPTH_SENSOR_TOPIC = '/ai/depth'
-RGB_SENSOR_TOPIC = '/ai/rgb'
+# ===============================================================================
+# GLOBAL VARIABLES DECLARATIONS
+# ===============================================================================
+global recordFlag, images_counter
+images_counter = 1001
+recordFlag = False
+
+FOLDER = os.path.dirname(os.path.realpath(_file_)) + "/capturedImages/"
+# ===============================================================================
+# METHODS
+# ===============================================================================
+
+# ===============================================================================
+# Topics
+# ===============================================================================
+
+RGB_BASE_TOPIC = "d435/rgb"
+DEPTH_BASE_TOPIC = "d435/depth"
+RGB_CLASSIFIED_TOPIC = "ai/rgb"
+DEPTH_CLASSIFIED_TOPIC = "ai/depth"
 
 
-class image_Viewer:
-
-    def __init__(self, RGB,DEPTH):
-
-        #Topics for camera feeds
-        self._rgbTopic = RGB
-        self._depthTopic = DEPTH
-
-        #Numpy arrays for storing camera data
-        self._rgbArr = None
-        self._depthArr = None
-
-        #OpenCV bridge
-        self._BRIDGE = CvBridge()
-
-        self._get_images()
-
- 
-        
-    def callback(self,rgb,depth):
-        while not rospy.is_shutdown():
-            try:
-                rgbImage = self._BRIDGE.imgmsg_to_cv2(rgb, "bgr8")
-
-                depthImage = self._BRIDGE.imgmsg_to_cv2(depth, "32FC1")
-                depthImage = cv2.cvtColor(depthImage, cv2.COLOR_GRAY2BGR)
-
-                images1 = np.hstack((rgbImage, depthImage))
-                cv2.imshow("AI - RGB and depth map", depthImage)
-
-            except rospy.ROSInterruptException:
-                print("Shuting down Enhanced Grasping!")
-            except IOError:
-                print("Shuting down Enhanced Grasping!")
+def callback(rgb, depth, ai_rgb, ai_depth):
+    global recordFlag, images_counter
+    cv_image_rgb = bridge.imgmsg_to_cv2(rgb, rgb.encoding)
+    cv_image_depth = bridge.imgmsg_to_cv2(depth, depth.encoding)
+    cv_image_ai_rgb = bridge.imgmsg_to_cv2(ai_rgb, ai_rgb.encoding)
+    cv_image_ai_depth = bridge.imgmsg_to_cv2(ai_depth, ai_depth.encoding)
+    if recordFlag:
+        cv2.imwrite(FOLDER + 'img' + str(images_counter) + '.jpg', cv_image_rgb)
+        images_counter += 1
+        images = np.hstack((cv_image_rgb, cv_image_depth))
+        cv2.imshow("RGB and depth map", images)
+    images1 = np.hstack((cv_image_ai_rgb, cv_image_ai_depth))
+    cv2.imshow("AI - RGB and depth map", images1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        rospy.signal_shutdown('Quit')
+        cv2.destroyAllWindows()
 
 
+def listener():
+    while not rospy.is_shutdown():
+        try:
+            image_ai_rgb_sub = message_filters.Subscriber(RGB_CLASSIFIED_TOPIC, Image)
+            image_ai_depth_sub = message_filters.Subscriber(DEPTH_CLASSIFIED_TOPIC, Image)
+            image_rgb_sub = message_filters.Subscriber(RGB_BASE_TOPIC, Image)
+            image_depth_sub = message_filters.Subscriber(DEPTH_BASE_TOPIC, Image)
+            ts = message_filters.ApproximateTimeSynchronizer(
+                [image_ai_rgb_sub, image_ai_depth_sub, image_rgb_sub, image_depth_sub], 10, 0.1)
+            ts.registerCallback(callback)
+            rospy.spin()
+        except rospy.ROSInterruptException:
+            print("Shutting down...")
+        except IOError:
+            print("Shutting down...")
 
-    def _get_images(self):
-        rospy.init_node('image', anonymous=True)
 
-        rgbImage=message_filters.Subscriber(self._rgbTopic, Image)
-
-        depthImage=message_filters.Subscriber(self._depthTopic, Image)
-        
-        ts = message_filters.ApproximateTimeSynchronizer([rgbImage, depthImage], 10, 0.1)
-        ts.registerCallback(self.callback)
-        rospy.spin()
+# ===============================================================================
+#  TESTING AREA
+# ===============================================================================
 
 
-
+# ===============================================================================
+# MAIN METHOD
+# ===============================================================================
 if __name__ == '__main__':
-    try:
-        I = image_Viewer(RGB_SENSOR_TOPIC,DEPTH_SENSOR_TOPIC)
+    bridge = CvBridge()
+    print("Listening to Topics:\n\nRGB Topic: ", RGB_BASE_TOPIC, "\nDepth Topic: ", DEPTH_BASE_TOPIC,
+          "\nClassified RGB Topic: ", RGB_CLASSIFIED_TOPIC, "\nClassified Depth Topic: ", DEPTH_CLASSIFIED_TOPIC, " \n")
 
-    except rospy.ROSInterruptException:
-        pass
+    rospy.init_node('dataRaw', anonymous=True)
+    listener()

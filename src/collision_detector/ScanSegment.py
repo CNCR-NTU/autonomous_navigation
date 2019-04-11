@@ -1,4 +1,4 @@
-#from LaserPoint import LaserPoint
+# from LaserPoint import LaserPoint
 from autonomous_navigation.msg import LaserPoint
 import math
 
@@ -9,29 +9,29 @@ class ScanSegment:
 
     def __init__(self, min, max, dist=None, ang=None, lRange=[], llinc=None):
         # Start and End angle
-        self.__minAng = min
-        self.__maxAng = max
+        self._minAng = min
+        self._maxAng = max
 
         # Maximum distance laser can reach
-        self.__laserMax = dist
+        self._laserMax = dist
 
         # Angle increment between scans
-        self.__angleIncrement = ang
+        self._angleIncrement = ang
 
         # Angle increment for building the LaserPoint List
-        self.__laserListIncrement = llinc
+        self._laserListIncrement = llinc
 
-        if self.__laserListIncrement == None:
-            self.__laserListIncrement = self.__angleIncrement
+        if self._laserListIncrement == None:
+            self._laserListIncrement = self._angleIncrement
 
         # List of Distance values and ABS Distance values
-        self.__LaserRange = self.setLaserRange(lRange)
-        self.__AbsRange = []
-        # self.__calcAbsRange()
+        self._LaserRange = self.setLaserRange(lRange)
+        self._AbsRange = []
+        # self._calcAbsRange()
 
         # Values for Average and Minimum distance over the range
-        self.__minDist = None
-        self.__avgDist = None
+        self._minDist = None
+        self._avgDist = None
 
     # ------------------------------------
     #           Getters
@@ -40,42 +40,42 @@ class ScanSegment:
     def getAngInc(self):
         "Returns angle increment between point."
 
-        return self.__angleIncrement
+        return self._angleIncrement
 
     def getMinAng(self):
         "Return start angle for scan."
 
-        return self.__minAng
+        return self._minAng
 
     def getMaxAng(self):
         "Return end angle for scan."
 
-        return self.__maxAng
+        return self._maxAng
 
     def getAbsRange(self):
         "Return a list of absolute distance values over the range."
 
-        return self.__AbsRange
+        return self._AbsRange
 
     def getAbsAvg(self):
         "Return average absolute distance over range."
 
-        return self.__avgDist
+        return self._avgDist
 
     def getAbsMin(self):
         "Return smallest absolute value over the range."
 
-        return self.__minDist
+        return self._minDist
 
     def getLaserRange(self):
         "Return a list of of LaserPoints."
 
-        return self.__LaserRange
+        return self._LaserRange
 
     def getMaxDist(self):
         "Returns Max distance of Laser"
 
-        return self.__laserMax
+        return self._laserMax
 
     # ------------------------------------
     #               Setters
@@ -84,32 +84,32 @@ class ScanSegment:
     def setAng(self, ang):
         "Sets value of angle increment."
 
-        self.__angleIncrement = ang
+        self._angleIncrement = ang
 
     def setLaserRange(self, DistArr):
         "Fills LaserPoint list with values"
 
         i = 0
 
-        if self.__laserListIncrement is None:
+        if self._laserListIncrement is None:
             inc = 1
         else:
-            inc = int(self.__laserListIncrement/self.__angleIncrement)
+            inc = int(self._laserListIncrement / self._angleIncrement)
 
-        self.__LaserRange = []
+        self._LaserRange = []
 
         while i < len(DistArr):
-            self.__LaserRange.append(LaserPoint(
-                self.__minAng+i*self.__angleIncrement, DistArr[i]))
+            self._LaserRange.append(LaserPoint(
+                self._minAng + i * self._angleIncrement, DistArr[i]))
             i += inc
 
-        self.__calcAbsRange()
-        self.__calcAbsDistances()
+        self._calcAbsRange()
+        self._calcAbsDistances()
 
     def setLaserMax(self, max):
         "Sets maximum laser value for refrence to prevent inf values."
 
-        self.__laserMax = max
+        self._laserMax = max
 
     # ------------------------------------
     #           Functions
@@ -118,41 +118,41 @@ class ScanSegment:
     def totalScans(self):
         "Returns total number of scans"
 
-        return len(self.__LaserRange)
+        return len(self._LaserRange)
 
     def minAngScans(self):
         "Returns number of scans done from origin angle and minimum angle."
 
-        return self.__minAng/self.__angleIncrement
+        return self._minAng / self._angleIncrement
 
     def maxAngScans(self):
         "Returns number of scans done from origin angle and maximum angle."
 
-        return self.__maxAng/self.__angleIncrement
+        return self._maxAng / self._angleIncrement
 
-    def __calcAbsRange(self):
+    def _calcAbsRange(self):
         "Calculates absolute distance values over range."
 
-        self.__AbsRange = []
+        self._AbsRange = []
 
-        for scan in self.__LaserRange:
-            self.__AbsRange.append(math.cos(scan.angle)*scan.distance)
+        for scan in self._LaserRange:
+            self._AbsRange.append(math.cos(scan.angle) * scan.distance)
 
-    def __calcAbsDistances(self):
+    def _calcAbsDistances(self):
         "Calculates average absolute distance value and minimum absolute distance over range."
 
         total = 0
         count = 0
-        self.__minDist = self.__laserMax
-        for scan in self.__LaserRange:
-            scanAbs = math.cos(scan.angle)*scan.distance
+        self._minDist = self._laserMax
+        for scan in self._LaserRange:
+            scanAbs = math.cos(scan.angle) * scan.distance
 
-            if scanAbs < self.__laserMax:
+            if scanAbs < self._laserMax:
                 total += scanAbs
                 count += 1
 
-                if scanAbs < self.__minDist:
-                    self.__minDist = scanAbs
+                if scanAbs < self._minDist:
+                    self._minDist = scanAbs
 
         if count != 0:
-            self.__avgDist = total/count
+            self._avgDist = total / count
