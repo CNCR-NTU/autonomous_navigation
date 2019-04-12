@@ -1,27 +1,22 @@
 #!/usr/bin/env python
 
-# ==============================
-#     Import Libraries 
-# ==============================
-import roslib
-import rospy
-import math
-from os import system
-# ==============================
-#     Import Messages 
-# ==============================
-
 import geometry_msgs.msg
-import sensor_msgs.msg
-import std_msgs.msg
+import math
+# ==============================
+#     Import Libraries
+# ==============================
+import rospy
 from autonomous_navigation.msg import Position
-from autonomous_navigation.msg import ScanAtPosition
+
+# ==============================
+#     Import Messages
+# ==============================
 
 # ==============================
 #     Set Topic Variables 
 # ==============================
 
-POS_TOPIC = '/summit_xl_controller/position'
+POS_TOPIC = '/summit_xl/position'
 GOAL_TOPIC = '/goal/position'
 CMD_TOPIC = '/summit_xl_control/cmd_vel'
 

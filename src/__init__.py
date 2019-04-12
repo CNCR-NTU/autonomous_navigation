@@ -1,9 +1,10 @@
 # from LaserPoint import LaserPoint
+import math
 from autonomous_navigation.msg import LaserPoint
 
 
 class ScanSegment:
-    """Structure for storing a LaserScan. Stores min and max angle of scan and all points within this range. 
+    """Structure for storing a LaserScan. Stores min and max angle of scan and all points within this range.
     Provides functionality for working out information within this range."""
 
     def __init__(self, min, max, dist=None, ang=None, lRange=[], llinc=None):
@@ -89,7 +90,11 @@ class ScanSegment:
         "Fills LaserPoint list with values"
 
         i = 0
-        inc = int(self._laserListIncrement / self._angleIncrement)
+
+        if self._laserListIncrement is None:
+            inc = 1
+        else:
+            inc = int(self._laserListIncrement / self._angleIncrement)
 
         self._LaserRange = []
 
@@ -98,12 +103,8 @@ class ScanSegment:
                 self._minAng + i * self._angleIncrement, DistArr[i]))
             i += inc
 
-        # for val in DistArr:
-        # self._LaserRange.append(LaserPoint(self._minAng+i*self._angleIncrement,val))
-        # i += 1
-
-        # self._calcAbsRange()
-        # self._calcAbsDistances()
+        self._calcAbsRange()
+        self._calcAbsDistances()
 
     def setLaserMax(self, max):
         "Sets maximum laser value for refrence to prevent inf values."
@@ -143,8 +144,6 @@ class ScanSegment:
         total = 0
         count = 0
         self._minDist = self._laserMax
-        print
-        self._LaserRange
         for scan in self._LaserRange:
             scanAbs = math.cos(scan.angle) * scan.distance
 

@@ -1,26 +1,32 @@
 #!/usr/bin/env python
 
+import sys
+
 import math
-import message_filters
 # ==============================
 #     Import Libraries
 # ==============================
 import rospy
-import std_msgs.msg
-from autonomous_navigation.msg import Position, ObjectsAtPosition
-from object_detection.msg import Objects
 
+sys.path.append('/home/josh/catkin_ws/src/autonomous_navigation')
+
+from src.Lib import ScanSegment
 # ==============================
 #     Import Messages
 # ==============================
+
+import std_msgs.msg
+from autonomous_navigation.msg import Position, ObjectsAtPosition
+import message_filters
+from object_detection.msg import Objects
 
 # ==============================
 #     Set Topic Variables
 # ==============================
 
 POS_TOPIC = '/summit_xl/position'
-POS_WITH_OBJ = '/summit_xl/PosWithObj'
-OBJECTS_TOPIC = "/ai/objects"
+POS_WITH_LASER = '/summit_xl/PosWithLaser'
+LASER_TOPIC = "/hokuyo_base/scan"
 
 # ==============================
 #       CAMERA VARIABLES
@@ -30,18 +36,18 @@ PIXEL_WIDTH = 640.0
 
 
 # ==============================
-#     GetObjects class
+#     get_objects class
 # ==============================
 
-class GetObjects:
+class GetLaser:
     """Subscribes to topics to obtain and group together the data required for plotting
     the Scatter Plot
     """
 
-    def __init__(self, output_top, object_top, pos_top, invertX=False, invertY=False):
+    def __init__(self, output_top, las_top, pos_top, invertX=False, invertY=False):
         """Creates instance of GetObjects class.
         output_top = Topic for resulting msg
-        object_top = Topic for Objects
+        las_top = Topic for Objects
         pos_top = Topic for Position of Robot
         invertX = Inverts generated coordinates in X plane
         invertY = Inverts generated coordinates in Y plane
@@ -53,32 +59,32 @@ class GetObjects:
         rospy.init_node('position_tracker', anonymous=True)
 
         # Set topic names
-        self._objectTopic = object_top
+        self._laserTopic = las_top
         self._positionTopic = pos_top
 
         # Position and Laser variables
         self._position = None
-        self._Objects = None
+        self._laserScan = None
 
         # Lists for publishing
-        self._classes, self._objectX, self._objectY = [], [], []
+        self._laserX, self._laserY = [], []
 
         # Sequence for header
         self._seq = 0
 
         # Begin subscribing
-        self._get_objects()
+        self._get_scan()
 
-    def _get_objects(self):
+    def _get_scan(self):
         """"Synchronises topics and subscribes when time stamp is same"""
 
         while not rospy.is_shutdown():
             try:
                 position_sub = message_filters.Subscriber(self._positionTopic, Position)
-                object_sub = message_filters.Subscriber(self._objectTopic, Objects)
+                laser_sub = message_filters.Subscriber(self._laserTopic, Objects)
 
                 ts = message_filters.ApproximateTimeSynchronizer(
-                    [position_sub, object_sub], 10, 0.1)
+                    [position_sub, laser_sub], 10, 0.1)
                 ts.registerCallback(self._callback)
                 rospy.spin()
             except rospy.ROSInterruptException:
@@ -86,48 +92,49 @@ class GetObjects:
             except IOError:
                 print("Shutting down...")
 
-    def _callback(self, position, objects):
+    def _callback(self, position, scan):
+
         # Set Current Position
         self._position = position
 
-        # Calc Object Coordinates
-        self._calc_object_coord(objects)
+        # Calc Laser Coordinates
+        scan_seg = ScanSegment(scan.angle_min, scan.angle_max, scan.range_max, scan.angle_increment,
+                               llinc=math.radians(1))
+        self._calc_laser_coord(scan_seg.getLaserRange(), scan_seg.getMaxDist())
 
         # Publish Coordinates
         self._publish()
 
-    def _calc_object_coord(self, obj_list):
-        self._classes, self._objectX, self._objectY = [], [], []
+    def _calc_laser_coord(self, laser_list, max_dist):
+        """Calculates all coordinates of LaserScans given their distance and angle.
+        """
+        self._laserX, self._laserZ = [], []
 
-        for obj in obj_list.objects:
-            ang = math.radians(
-                (PIXEL_WIDTH / 2.0 - (obj.x + obj.w / 2)) * (FIELD_OF_VIEW / PIXEL_WIDTH)) + self._position.orientation
+        for scan in laser_list:
+            ang = scan.angle + self._position.orientation
 
-            print('Pixel Displacement: ', PIXEL_WIDTH / 2.0 - obj.x)
-
-            dist = obj.z * 1000  # Get in mm
-
-            if abs(ang) <= math.pi / 2:
-                x = math.sin(ang) * dist
-                z = math.cos(ang) * dist
-            else:
-                if ang > 0:
-                    x = (math.sin(ang) * dist)
-                    z = (math.cos(ang) * dist)
+            dist = scan.distance
+            if dist < max_dist:
+                dist *= 1000.0  # Convert to mm
+                if abs(ang) <= math.pi / 2:
+                    x = math.sin(ang) * dist
+                    z = math.cos(ang) * dist
                 else:
-                    x = (math.sin(ang) * dist)
-                    z = -(math.cos(ang) * dist)
+                    if ang > 0:
+                        x = (math.sin(ang) * dist)
+                        z = (math.cos(ang) * dist)
+                    else:
+                        x = (math.sin(ang) * dist)
+                        z = -(math.cos(ang) * dist)
 
-            self._classes.append(obj.name)
-            self._objectX.append(self._position.xPos + x * (-1 if self._invertX else 1))
-            self._objectY.append(self._position.zPos + z * (-1 if self._invertY else 1))
+                self._laserX.append(self._position.xPos + x * (-1 if self._invertX else 1))
+                self._laserY.append(self._position.zPos + z * (-1 if self._invertY else 1))
 
     def _publish(self):
         """Create the message and publish to topic"""
 
-        msg = ObjectsAtPosition(self._position, self._classes,
-                                self._objectX,
-                                self._objectY)
+        msg = ObjectsAtPosition(self._position, self._laserX,
+                                self._laserY)
         msg.pos.header = std_msgs.msg.Header(stamp=rospy.Time.now(), seq=self._seq)
 
         self._seq += 1
@@ -139,7 +146,7 @@ class GetObjects:
 
 if __name__ == '__main__':
     try:
-        PT = GetObjects(POS_WITH_OBJ, OBJECTS_TOPIC, POS_TOPIC, invertX=True)
+        PT = GetLaser(POS_WITH_LASER, LASER_TOPIC, LASER_TOPIC, invertX=True)
 
     except rospy.ROSInterruptException:
         pass

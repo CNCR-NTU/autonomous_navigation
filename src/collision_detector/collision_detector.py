@@ -4,14 +4,15 @@
 #     Import Libraries
 # ==============================
 
-import rospy
-import roslib
+import sys
 
 import math
-import numpy
+import rospy
 
-from warning_level import WarnLVL
-from ScanSegment import ScanSegment
+sys.path.append('/home/josh/catkin_ws/src/autonomous_navigation')
+
+from src.Lib.ScanSegment import ScanSegment
+from src.Lib.WarningLevel import WarnLVL
 
 # ==============================
 #     Import Messages

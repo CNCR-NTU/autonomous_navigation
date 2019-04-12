@@ -1,10 +1,10 @@
 # from LaserPoint import LaserPoint
-from autonomous_navigation.msg import LaserPoint
 import math
+from autonomous_navigation.msg import LaserPoint
 
 
 class ScanSegment:
-    """Structure for storing a LaserScan. Stores min and max angle of scan and all points within this range. 
+    """Structure for storing a LaserScan. Stores min and max angle of scan and all points within this range.
     Provides functionality for working out information within this range."""
 
     def __init__(self, min, max, dist=None, ang=None, lRange=[], llinc=None):

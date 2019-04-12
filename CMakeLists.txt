@@ -51,7 +51,8 @@ add_message_files(
   FILES
   LaserPoint.msg
   Position.msg
-  ScanAtPosition.msg
+  ObjectsAtPosition.msg
+  #MapData.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -45,16 +45,12 @@ __platforms__ = "Sawyer and AR10 hand"
 # ===============================================================================
 # IMPORT STATEMENTS
 # ===============================================================================
-from rospy_tutorials.msg import Floats
-from rospy.numpy_msg import numpy_msg
-from std_msgs.msg import String
 import os
 import numpy as np
-import time
 import cv2
 import rospy
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import message_filters
 
 # ===============================================================================

@@ -4,22 +4,16 @@
 #     Import Libraries
 # ==============================
 
-import rospy
-import roslib
-
 import socket
 import struct
 
-import math
+import rospy
+import std_msgs.msg
+from autonomous_navigation.msg import Position
 
 # ==============================
 #     Import Messages
 # ==============================
-
-import std_msgs.msg
-import geometry_msgs.msg
-import sensor_msgs.msg
-from autonomous_navigation.msg import Position
 
 # ==============================
 #       Set IP Address 
@@ -32,7 +26,7 @@ UDP_PORT = 51001
 #     Set Topic Variables 
 # ==============================
 
-POS_TOPIC = '/summit_xl_controller/position'
+POS_TOPIC = '/summit_xl/position'
 GOAL_TOPIC = '/goal/position'
 
 
@@ -89,16 +83,23 @@ class vicon_tracker:
                 Orientation = (struct.unpack_from('d', data, 72))[0]
 
                 # Send Position Message
-                self.SummitPositionNode.publish(Position(Orientation, xPos, zPos))
+                self.SummitPositionNode.publish(
+                    Position(std_msgs.msg.Header(stamp=rospy.Time.now()), Orientation, xPos, zPos))
+            else:
+                # Summit Not Detected, Publish default values
+                self.SummitPositionNode.publish(
+                    Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, 0.0, 0.0))
 
             if object2name == "Goal":
                 # Unpack Variables
                 xPos = (struct.unpack_from('d', data, 107))[0]
                 zPos = (struct.unpack_from('d', data, 115))[0]
 
+                goal_head = std_msgs.msg.Header()
+                goal_head.stamp = rospy.Time.now()
+                self.SummitPositionNode.publish(Position(goal_head, Orientation, xPos, zPos))
                 # Send Position Message
                 self.GoalPositionNode.publish(Position(0.0, xPos, zPos))
-
             rate.sleep()
 
 
