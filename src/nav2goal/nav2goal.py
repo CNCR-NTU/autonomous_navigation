@@ -109,10 +109,10 @@ class nav2goal:
 
         # Calculate Speed
         if abs(toTurn) > math.radians(15):  # Check if need to turn
-            TurnSpeed = 0.2
+            TurnSpeed = 0.02
         else:
             if abs(toTurn) > math.radians(1):
-                TurnSpeed = 0.1
+                TurnSpeed = 0.01
             else:
                 TurnSpeed = 0
                 self._isAligned = True
@@ -141,7 +141,7 @@ class nav2goal:
                              (self._goalPos.zPos - self._summitPos.zPos) ** 2)
 
         msg = geometry_msgs.msg.Twist()
-        msg.linear.x = 0.3
+        msg.linear.x = 0.005
 
         if Distance > 1000:  # Check if need to turn
             self._cmdNode.publish(msg)

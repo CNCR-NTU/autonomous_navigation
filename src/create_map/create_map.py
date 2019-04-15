@@ -50,6 +50,10 @@ class create_map:
         # Scatter Plot
         self._fig, self._scatPlot = plt.subplots()
 
+        # Inverters
+        self._invertX = invertX
+        self._invertY = invertY
+
         # =========================================
         #           Lists for storing data
         # =========================================
@@ -59,7 +63,7 @@ class create_map:
         self._goalX, self._goalZ = [], []
         self._objectX, self._objectZ = [], []
         self._objectNames = []
-
+        self._objectDetected = False
         # =========================================
         #               Create Plots
         # =========================================
@@ -93,7 +97,6 @@ class create_map:
         Node keeps subscribing due to plot loop."""
 
         rospy.Subscriber(self._goalTopic, Position, self._goal_callback, queue_size=1)
-
         rospy.Subscriber(self._objectTopic, ObjectsAtPosition,
                          self._object_callback, queue_size=1)
 
@@ -108,6 +111,7 @@ class create_map:
 
     def _goal_callback(self, value):
         """Set values of Goal coordinates"""
+        self._objectDetected = False
 
         self._goalX, self._goalZ = [], []
 
@@ -116,13 +120,11 @@ class create_map:
 
     def _object_callback(self, data):
 
-        self._summitX, self._summitZ = [], []
+        self._objectDetected = True
 
-        self._summitX.append(data.pos.xPos)
-        self._summitZ.append(data.pos.zPos)
-        # Clear out Arrays
-        self._objectX, self.objectsY, self._objectNames = [], [], []
+        self._objectX, self._objectZ, self._objectNames = [], [], []
 
+        # Set Object Positions and Labels
         self._objectX = data.objectsX
         self._objectZ = data.objectsY
         self._objectNames = data.objects
@@ -131,7 +133,7 @@ class create_map:
 
         # Clear out Arrays
         self._summitX, self._summitZ = [], []
-        self.objectsY, self._objectNames = [], [], []
+        self._laserX, self._laserZ = [], []
 
         # Set Summit Position
         self._summitX.append(data.pos.xPos)
@@ -139,7 +141,7 @@ class create_map:
 
         # Set Laser Positions
         self._laserX = data.laserX
-        self._laserY = data.laserY
+        self._laserZ = data.laserY
 
         self._plot_map()
 
@@ -183,7 +185,7 @@ class create_map:
         """Plots Object coordinates with respective annotation"""
 
         # Remove Existing Annotations
-        for i, annotation in enumerate(self._objectAnnotations):
+        for annotation in self._objectAnnotations:
             annotation.remove()
         self._objectAnnotations[:] = []
 
@@ -208,11 +210,11 @@ class create_map:
         if len(self._summitX) > 0:
             self._plot_summit()
 
-        if len(self._objectX) > 0:
-            self._plot_objects()
+        self._plot_objects()
 
         # Update Plot
         self._fig.canvas.draw_idle()
+
         plt.pause(0.01)
 
     def _set_plot_limits(self, dist):

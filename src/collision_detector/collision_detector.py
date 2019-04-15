@@ -51,8 +51,8 @@ class collision_detector:
     """
 
     # 0 Is path clear, 1 is Collsion, 2 is crashed
-    _WarnLvls = [WarnLVL('\033[92m', 0.35, 'Path Clear'),
-                 WarnLVL('\033[93m', 0.2, 'Object Detected, Slowing Down'),
+    _WarnLvls = [WarnLVL('\033[92m', 0.005, 'Path Clear'),
+                 WarnLVL('\033[93m', 0.001, 'Object Detected, Slowing Down'),
                  WarnLVL('\033[91m', 0, 'Collision Imminent, Stopping Vehicle')]
 
     # Dimensions used for calculations

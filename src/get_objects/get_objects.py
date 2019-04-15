@@ -50,7 +50,7 @@ class GetObjects:
         # Create publisher and Init Node
         self._positionNode = rospy.Publisher(
             output_top, ObjectsAtPosition, queue_size=1)
-        rospy.init_node('position_tracker', anonymous=True)
+        rospy.init_node('get_objects', anonymous=True)
 
         # Set topic names
         self._objectTopic = object_top
@@ -65,6 +65,10 @@ class GetObjects:
 
         # Sequence for header
         self._seq = 0
+
+        # Inverters
+        self._invertX = invertX
+        self._invertY = invertY
 
         # Begin subscribing
         self._get_objects()
@@ -81,17 +85,18 @@ class GetObjects:
                     [position_sub, object_sub], 10, 0.1)
                 ts.registerCallback(self._callback)
                 rospy.spin()
+
             except rospy.ROSInterruptException:
                 print("Shutting down...")
             except IOError:
                 print("Shutting down...")
 
-    def _callback(self, position, objects):
+    def _callback(self, position, data):
         # Set Current Position
         self._position = position
 
         # Calc Object Coordinates
-        self._calc_object_coord(objects)
+        self._calc_object_coord(data.objects)
 
         # Publish Coordinates
         self._publish()
@@ -99,11 +104,9 @@ class GetObjects:
     def _calc_object_coord(self, obj_list):
         self._classes, self._objectX, self._objectY = [], [], []
 
-        for obj in obj_list.objects:
+        for obj in obj_list:
             ang = math.radians(
                 (PIXEL_WIDTH / 2.0 - (obj.x + obj.w / 2)) * (FIELD_OF_VIEW / PIXEL_WIDTH)) + self._position.orientation
-
-            print('Pixel Displacement: ', PIXEL_WIDTH / 2.0 - obj.x)
 
             dist = obj.z * 1000  # Get in mm
 

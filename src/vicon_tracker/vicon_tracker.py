@@ -97,9 +97,14 @@ class vicon_tracker:
 
                 goal_head = std_msgs.msg.Header()
                 goal_head.stamp = rospy.Time.now()
-                self.SummitPositionNode.publish(Position(goal_head, Orientation, xPos, zPos))
                 # Send Position Message
                 self.GoalPositionNode.publish(Position(0.0, xPos, zPos))
+            else:
+                # Send Default Position Message
+
+                self.GoalPositionNode.publish(
+                    Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, 1500.0, 1500.0))
+
             rate.sleep()
 
 

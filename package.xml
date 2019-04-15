@@ -7,10 +7,8 @@
 
   <maintainer email="joshpaveley@gmail.com">Josh Paveley</maintainer>
 
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+
+    <license>NTU CNCR (C)</license>
 
   <url type="repository">https://github.com/CNCR-NTU/autonomous_navigation</url>
 
