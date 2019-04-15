@@ -109,10 +109,10 @@ class nav2goal:
 
         # Calculate Speed
         if abs(toTurn) > math.radians(15):  # Check if need to turn
-            TurnSpeed = 0.02
+            TurnSpeed = 0.01
         else:
             if abs(toTurn) > math.radians(1):
-                TurnSpeed = 0.01
+                TurnSpeed = 0.005
             else:
                 TurnSpeed = 0
                 self._isAligned = True

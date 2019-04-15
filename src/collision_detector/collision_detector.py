@@ -13,6 +13,7 @@ sys.path.append('/home/josh/catkin_ws/src/autonomous_navigation')
 
 from src.Lib.ScanSegment import ScanSegment
 from src.Lib.WarningLevel import WarnLVL
+from object_detection.msg import Objects
 
 # ==============================
 #     Import Messages
@@ -25,9 +26,9 @@ import sensor_msgs.msg
 #     Set Topic Variables 
 # ==============================
 
-LASER_TOPIC = "/hokuyo_base/scan"
+LASER_TOPIC = "/summit_xl/front_laser/scan"
 VELOCITY_TOPIC = "/summit_xl_control/cmd_vel"
-
+OBJECT_TOPIC = "/ai/objects"
 # ==============================
 #   Set Collision Variables 
 # ==============================
@@ -59,7 +60,7 @@ class collision_detector:
     _ROBOT_WIDTH = 0.7
     _SCANNER_TO_FRONT_DIST = 0.45
 
-    def __init__(self, lasTop, velTop, wDis, sDis, tol):
+    def __init__(self, lasTop, objTop, velTop, wDis, sDis, tol):
         """Creates instance of collision_detector:
         lasTop = ROSTopic for laser
         velTop = ROSTopic for moving robot
@@ -69,6 +70,8 @@ class collision_detector:
 
         # Topic
         self._laserTopic = lasTop
+        self._objectTopic = objTop
+
         # Specified distances for slowing and stopping
         self._warnDis = wDis
         self._stopDis = sDis
@@ -78,6 +81,8 @@ class collision_detector:
 
         # Array of Laser values
         self._WarnLVL = 0
+
+        self._objects = []
 
         rospy.init_node('laser', anonymous=True)
         self._velocityNode = rospy.Publisher(
@@ -97,7 +102,7 @@ class collision_detector:
         cmd.linear.x = self._WarnLvls[self._WarnLVL].get_velocity()
         self._velocityNode.publish(cmd)
 
-    def _callback(self, scan):
+    def _laser_callback(self, scan):
         """Called upon receiving new scan, handles scan information"""
 
         # Set scan angle increment and laser range
@@ -113,14 +118,21 @@ class collision_detector:
 
         self._checkScan()
 
-        self._move()
+        # self._move()
 
-        self._printInfo()
+        self._print_info()
+
+    def _object_callback(self, data):
+        self._objects = []
+
+        self._objects = data.objects
 
     def _checkScan(self):
         """Check stopping and warning distances from the given scan. Test against tolerance level"""
 
         lvl2Count, lvl3Count = 0, 0
+
+        objectDecteted = self._checkObjects()
 
         for Dist in self._frontFoV.getAbsRange():
 
@@ -136,29 +148,51 @@ class collision_detector:
                     self._WarnLVL = 1
                     break
 
-            self._WarnLVL = 0
+            if not objectDecteted:
+                self._WarnLVL = 0
 
-    def _printInfo(self):
+    def _checkObjects(self):
+        for obj in self._objects:
+            if obj.z < self._stopDis:
+                self._WarnLVL = 2
+                return True
+            if obj.z < self._warnDis:
+                self._WarnLVL = 1
+                return True
+
+        return False
+
+    def _print_obj_list(self):
+        print('\033[1mDetected Objects:\033[0m')
+        for obj in self._objects:
+            print("{}: {} m").format(obj.name, obj.z)
+        self._objects = []
+
+    def _print_info(self):
         """Print system info for user"""
 
         print('\n\033[4m' + '\033[1m' + 'Summit_XL Collision Detection' + '\033[0m')
         print('\nWarn Distance: {}m \t Stop Distance: {}m'.format(self._warnDis, self._stopDis))
-        print('Average Distance: {} \t Minimum Distance: {}'.format(self._frontFoV.getAbsAvg(),
-                                                                    self._frontFoV.getAbsMin()))
+        print('\033[1mLaser Values\033[0m')
+        print('Average Distance: {} \t Minimum Distance: {}'.format(
+            self._frontFoV.getAbsAvg() - self._SCANNER_TO_FRONT_DIST,
+            self._frontFoV.getAbsMin() - self._SCANNER_TO_FRONT_DIST))
+        self._print_obj_list()
         print(self._WarnLvls[self._WarnLVL].get_Warning())
         print('\n---------------------------------------------------------------')
 
     def _get_scan(self):
         """Subscribes to the LaserScan topic and calls the callback"""
-
         rospy.Subscriber(self._laserTopic,
-                         sensor_msgs.msg.LaserScan, self._callback)
+                         sensor_msgs.msg.LaserScan, self._laser_callback)
+
+        rospy.Subscriber(self._objectTopic, Objects, self._object_callback)
         rospy.spin()
 
 
 if __name__ == '__main__':
     try:
-        L = collision_detector(LASER_TOPIC, VELOCITY_TOPIC,
+        L = collision_detector(LASER_TOPIC, OBJECT_TOPIC, VELOCITY_TOPIC,
                                WARN_DISTANCE, STOP_DISTANCE, LOT)
 
     except rospy.ROSInterruptException:
