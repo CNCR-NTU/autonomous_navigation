@@ -61,23 +61,31 @@ $ roscd summit_xl_bringup/launch/
 $ nano summit_xl_complete.launch
 ```
 Add the line: 
-```<node pkg="object_detection" type="objectClassification.py" name="objectClassifier" output="screen" />```
-at the end of the file before `</launch>
+```
+<node pkg="object_detection" type="objectClassification.py" name="objectClassifier" output="screen" />
+```
+at the end of the file before `</launch>`
 
-## Step 2: Ensure all dependencies are installed on your computer
+Rebuild the catkin_ws: 
+```
+$ cd ~/catkin_ws
+$ catkin_make
+```
+
+## Step 3: Ensure all dependencies are installed on your computer
 ### Summit Dependancies
 ```
 $ sudo apt-get ros-kinetic-summit-xl*
 $ sudo apt-get ros-kinetic-robotnik*
 ```
-## Step 3: Clone this repository to your /src/ folder
+## Step 4: Clone this repository to your /src/ folder
 ```
 $ cd ~/catkin_ws/src
 $ git clone https://github.com/CNCR-NTU/autonomous_navigation
 $ cd ~/catkin_ws
 $ catkin_make
 ```
-## Step 4: Setup Summit_XL
+## Step 5: Setup Summit_XL
 Ensure both your Summit_XL **and** the robot's internal computer are turned on.
 
 Connect to the Summit's wifi network.
@@ -88,7 +96,7 @@ Export ROS master using hostname from /etc/hosts file you configured in setup.
 $ echo "export ROS_MASTER_URI=http://{SUMMIT-HOSTNAME}:11311" >> ~/.bashrc
 ```
 
-## Step 5: Run
+## Step 6: Run
 Ensure your workspace is sourced:
 ```
 $ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
