@@ -12,10 +12,24 @@ http://wiki.ros.org/Robots/SummitXL
 
 * Pedro Machado <pedro.baptistamachado@ntu.ac.uk>
 
+## Requirements:
+
+* Ubuntu 16.04 (Installed and Configured)
+
+* ROS Kinetic (Installed and Configured)
+
+* Summit_XL (Installed and Configured with your PC)
+
+See Step 1 for help with any requirements not met.
 
 ## Step 1: Install ROS Kinetic and Configure Summit_XL
+Skip if all requirements are met
+
+For help installing Ubuntu 16.04 consult the [Offical Install Page](http://releases.ubuntu.com/16.04/)
 
 For help installing ROS Kinetic consult the [ROS Wiki](http://wiki.ros.org/kinetic/Installation/Ubuntu).
+
+For help setting up the Summit_XL on Ubuntu version 16.04 consult the documentation in the repository.
 
 For help configuring your Summit_XL with your computer consult the tutorial on the [CNCR Summit Wiki](https://github.com/CNCR-NTU/summitxl).
 
@@ -62,7 +76,7 @@ $ nano summit_xl_complete.launch
 ```
 Add the line: 
 ```
-<node pkg="object_detection" type="objectClassification.py" name="objectClassifier" output="screen" />
+<node pkg="object_detection" type="objectClassification_ObjMsg.py" name="objectClassifier" output="screen" />
 ```
 at the end of the file before `</launch>`
 
