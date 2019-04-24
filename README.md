@@ -17,9 +17,55 @@ http://wiki.ros.org/Robots/SummitXL
 
 For help installing ROS Kinetic consult the [ROS Wiki](http://wiki.ros.org/kinetic/Installation/Ubuntu).
 
-For help configuring your Summit_XL with your computer consult the tutorial on this wiki.
+For help configuring your Summit_XL with your computer consult the tutorial on the [CNCR Summit Wiki](https://github.com/CNCR-NTU/summitxl).
 
-## Step 2: Ensure all dependencies are installed
+## Step 2: Install Object Classifier on Summit_XL
+Ensure you have configured your system with the as described in Step 1.
+
+Connect to Wifi of Summit.
+
+SSH into the Summit: `$ ssh summit@summit`
+
+Clone package into catkin_ws:
+```
+$ cd ~/catkin_ws/src
+$ git clone https://gitlab.com/CNCR-NTU/object_detection.git
+
+Follow instructions from the README.md file as detailed below.
+```
+### Step 1 Install OpenCV 4
+Run the install script:
+```
+$ cd object_detection/
+$ ./install_opencv4-0-1.sh
+```
+Test the installation.
+```
+$ python 3
+> import cv2
+> cv2.__version__
+```
+**NOTE:** Open a new teminal if it fails.
+
+Installation procedure retrieved from [here](https://www.pyimagesearch.com/2018/08/15/how-to-install-opencv-4-on-ubuntu/)
+
+### Step 2 Install the librealsense 2 
+Follow the steps described [here](https://github.com/IntelRealSense/librealsense/blob/development/doc/installation.md)
+
+### Step 3 Install the pyrealsense 2
+Follow the steps described [here](https://github.com/IntelRealSense/librealsense/tree/master/wrappers/python)
+
+## Running the application
+`$ python3 objectClassification.py`
+
+## Troubleshooting
+1) profile error. 
+    * Check the USB cable and make sure that the camera is being detected as USB3
+    * Adjust the parameters
+
+
+## Step 2: Ensure all dependencies are installed on your computer
+### Summit Dependancies
 ```
 $ sudo apt-get ros-kinetic-summit-xl*
 $ sudo apt-get ros-kinetic-robotnik*
@@ -37,18 +83,30 @@ Ensure both your Summit_XL **and** the robot's internal computer are turned on.
 Connect to the Summit's wifi network.
 
 Export ROS master using hostname from /etc/hosts file you configured in setup.
+
 ```
-$ export ROS_MASTER_URI=http://{SUMMIT-HOSTNAME}:11311
+$ echo "export ROS_MASTER_URI=http://{SUMMIT-HOSTNAME}:11311" >> ~/.bashrc
 ```
 
 ## Step 5: Run
-Source your workspace
+Ensure your workspace is sourced:
 ```
-$ source ~/catkin_ws/devel/setup.bash
+$ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```
-Launch file
+Launch files
+### Complete.Launch
+Launches all packages.
 ```
-$ roslaunch autonomous_navigation get_laser.launch
+$ roslaunch autonomous_navigation Complete.launch
 ```
-
+### Autonomous_Navigation.Launch
+Launches packages that enable Autonomous_Navigation functionalities in the robot.
+```
+$ roslaunch autonomous_navigation Autonomous_Navigation.launch
+```
+### Monitor_System.Launch
+Launches packages that monitor the stage of the system.
+```
+$ roslaunch autonomous_navigation Monitor_System.launch
+```
 2018 (c) Computational Neurosciences and Cognitive Robotics Lab - Nottingham Trent University
