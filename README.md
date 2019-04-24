@@ -33,7 +33,7 @@ $ git clone https://gitlab.com/CNCR-NTU/object_detection.git
 
 Follow instructions from the README.md file as detailed below.
 ```
-### Step 1 Install OpenCV 4
+### Step 2.1 Install OpenCV 4
 Run the install script:
 ```
 $ cd object_detection/
@@ -49,20 +49,20 @@ $ python 3
 
 Installation procedure retrieved from [here](https://www.pyimagesearch.com/2018/08/15/how-to-install-opencv-4-on-ubuntu/)
 
-### Step 2 Install the librealsense 2 
+### 2.2 Install the librealsense 2 
 Follow the steps described [here](https://github.com/IntelRealSense/librealsense/blob/development/doc/installation.md)
 
-### Step 3 Install the pyrealsense 2
+### 2.3 Install the pyrealsense 2
 Follow the steps described [here](https://github.com/IntelRealSense/librealsense/tree/master/wrappers/python)
 
-## Running the application
-`$ python3 objectClassification.py`
-
-## Troubleshooting
-1) profile error. 
-    * Check the USB cable and make sure that the camera is being detected as USB3
-    * Adjust the parameters
-
+### 2.4 Add classifer to Summit launch files
+```
+$ roscd summit_xl_bringup/launch/
+$ nano summit_xl_complete.launch
+```
+Add the line: 
+```<node pkg="object_detection" type="objectClassification.py" name="objectClassifier" output="screen" />```
+at the end of the file before `</launch>
 
 ## Step 2: Ensure all dependencies are installed on your computer
 ### Summit Dependancies
