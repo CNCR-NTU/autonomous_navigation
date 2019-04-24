@@ -138,7 +138,7 @@ class create_map:
         # Set Summit Position
         self._summitX.append(data.pos.xPos)
         self._summitZ.append(data.pos.zPos)
-
+        self._Position = data.pos
         # Set Laser Positions
         self._laserX = data.laserX
         self._laserZ = data.laserY

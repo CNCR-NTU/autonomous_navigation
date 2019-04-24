@@ -19,8 +19,8 @@ from object_detection.msg import Objects
 #     Import Messages
 # ==============================
 
-import geometry_msgs.msg
 import sensor_msgs.msg
+from std_msgs.msg import Float32
 
 # ==============================
 #     Set Topic Variables 
@@ -52,8 +52,8 @@ class collision_detector:
     """
 
     # 0 Is path clear, 1 is Collsion, 2 is crashed
-    _WarnLvls = [WarnLVL('\033[92m', 0.005, 'Path Clear'),
-                 WarnLVL('\033[93m', 0.001, 'Object Detected, Slowing Down'),
+    _WarnLvls = [WarnLVL('\033[92m', 0.02, 'Path Clear'),
+                 WarnLVL('\033[93m', 0.01, 'Object Detected, Slowing Down'),
                  WarnLVL('\033[91m', 0, 'Collision Imminent, Stopping Vehicle')]
 
     # Dimensions used for calculations
@@ -86,7 +86,7 @@ class collision_detector:
 
         rospy.init_node('laser', anonymous=True)
         self._velocityNode = rospy.Publisher(
-            velTop, geometry_msgs.msg.Twist, queue_size=1)
+            velTop, Float32, queue_size=1)
 
         self._get_scan()
 
@@ -95,12 +95,11 @@ class collision_detector:
 
         return math.atan((self._ROBOT_WIDTH / 2) / (self._SCANNER_TO_FRONT_DIST + self._stopDis))
 
-    def _move(self):
-        """Automatically moves the robot by publishing to the cmd topic"""
+    def _setSpeed(self):
+        """Automatically sets the speed of the robot based on obstacles encountered"""
 
-        cmd = geometry_msgs.msg.Twist()
-        cmd.linear.x = self._WarnLvls[self._WarnLVL].get_velocity()
-        self._velocityNode.publish(cmd)
+        speed = self._WarnLvls[self._WarnLVL].get_velocity()
+        self._velocityNode.publish(Float32(speed))
 
     def _laser_callback(self, scan):
         """Called upon receiving new scan, handles scan information"""
@@ -118,7 +117,7 @@ class collision_detector:
 
         self._checkScan()
 
-        # self._move()
+        self._setSpeed()
 
         self._print_info()
 

@@ -2,56 +2,20 @@
 
 from __future__ import print_function
 
-# -*- coding: utf-8 -*-
-"""
-:ABSTRACT:
-This script is part of the Enhanced grasp project
-
-:REQUIRES:
-
-:
-:AUTHOR:  Pedro Machado
-:ORGANIZATION: Nottingham Trent University
-:CONTACT: pedro.baptistamachado@ntu.ac.uk
-:SINCE: <date>
-:VERSION: 0.1
-
-This file is part of <project> project.
-the Robot 2 Robot interaction project can not be copied and/or distributed without the express
-permission of Prof. Martin McGinnity <martin.mcginnity@ntu.ac.uk>
-
-Copyright (C) 2019 All rights reserved, Nottingham Trent University
-Computational Neuroscience and Cognitive Robotics Laboratory
-email:  pedro.baptistamachado@ntu.ac.uk
-website: https://www.ntu.ac.uk/research/groups-and-centres/groups/computational-neuroscience-and-cognitive-robotics-laboratory
-
-
-"""
-# ===============================================================================
-# PROGRAM METADATA
-# ===============================================================================
-__author__ = 'Pedro Machado'
-__contact__ = 'pedro.baptistamachado@ntu.ac.uk'
-__copyright__ = 'Enhanced grasping project can not be copied and/or distributed \
-without the express permission of Prof. Martin McGinnity <martin.mcginnity@ntu.ac.uk'
-__license__ = '2019 (C) CNCR@NTU, All rights reserved'
-__date__ = '13/02/2019'
-__version__ = '0.1'
-__file__name__ = 'getImage.py'
-__description__ = 'image subscriber'
-__compatibility__ = "Python 2"
-__platforms__ = "Sawyer and AR10 hand"
-
 # ===============================================================================
 # IMPORT STATEMENTS
 # ===============================================================================
 import os
-import numpy as np
+
 import cv2
-import rospy
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
 import message_filters
+import numpy as np
+import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
+
+# -*- coding: utf-8 -*-
+# CODE ADAPTED FROM Pedro Machado's GET_IMAGE.py
 
 # ===============================================================================
 # GLOBAL VARIABLES DECLARATIONS

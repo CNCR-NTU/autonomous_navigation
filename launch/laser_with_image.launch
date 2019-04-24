@@ -1,4 +1,0 @@
-<launch> 
-    <node pkg="autonomous_navigation" type="get_image.py" name="get_image" output="screen" />
-    <node pkg="autonomous_navigation" type="collision_detector.py" name="collision_detector" output="screen" />
-</launch>

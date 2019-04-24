@@ -1,4 +1,0 @@
-<launch> 
-    <node pkg="autonomous_navigation" type="collision_detector.py" name="collision_detector" output="screen" />
-    <node pkg="autonomous_navigation" type="create_map.py" name="create_map" output="screen" />
-</launch>

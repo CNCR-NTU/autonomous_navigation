@@ -68,6 +68,8 @@ class vicon_tracker:
         ROS Messages to be published"""
         rate = rospy.Rate(30)
 
+        lastpos = None
+
         while not rospy.is_shutdown():
             data, addr = self._sock.recvfrom(1024)  # buffer size is 1024 bytes
             frame = struct.unpack_from('I', data, 0)
@@ -91,20 +93,18 @@ class vicon_tracker:
                     Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, 0.0, 0.0))
 
             if object2name == "Goal":
+                goalShown = True
                 # Unpack Variables
                 xPos = (struct.unpack_from('d', data, 107))[0]
                 zPos = (struct.unpack_from('d', data, 115))[0]
 
-                goal_head = std_msgs.msg.Header()
-                goal_head.stamp = rospy.Time.now()
+                pos = Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, xPos, zPos)
+                lastpos = pos
                 # Send Position Message
-                self.GoalPositionNode.publish(Position(0.0, xPos, zPos))
+                self.GoalPositionNode.publish(Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, xPos, zPos))
             else:
-                # Send Default Position Message
-
-                self.GoalPositionNode.publish(
-                    Position(std_msgs.msg.Header(stamp=rospy.Time.now()), 0.0, 1500.0, 1500.0))
-
+                if lastpos is not None:
+                    self.GoalPositionNode.publish(lastpos)
             rate.sleep()
 
 

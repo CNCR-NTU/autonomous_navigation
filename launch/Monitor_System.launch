@@ -3,4 +3,5 @@
     <node pkg="autonomous_navigation" type="get_laser.py" name="get_laser" output="screen" />
     <node pkg="autonomous_navigation" type="get_objects.py" name="get_objects" output="screen" />
     <node pkg="autonomous_navigation" type="create_map.py" name="create_map" output="screen" />
+    <node pkg="autonomous_navigation" type="get_image.py" name="get_image" output="screen" />
 </launch>

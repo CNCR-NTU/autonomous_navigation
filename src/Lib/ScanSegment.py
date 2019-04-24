@@ -21,11 +21,11 @@ class ScanSegment:
         # Angle increment for building the LaserPoint List
         self._laserListIncrement = llinc
 
-        if self._laserListIncrement == None:
+        if self._laserListIncrement is None:
             self._laserListIncrement = self._angleIncrement
 
         # List of Distance values and ABS Distance values
-        self._LaserRange = self.setLaserRange(lRange)
+        self.setLaserRange(lRange)
         self._AbsRange = []
         # self._calcAbsRange()
 

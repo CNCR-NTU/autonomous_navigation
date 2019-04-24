@@ -1,3 +1,0 @@
-<launch> 
-    <node pkg="autonomous_navigation" type="get_objects.py" name="get_objects" output="screen" />
-</launch>

@@ -122,7 +122,7 @@ class GetLaser:
                 ang = scan.angle + self._position.orientation
 
                 dist = scan.distance
-                if dist < max_dist:
+                if 0.2 < dist < max_dist:
                     dist *= 1000.0  # Convert to mm
                     if abs(ang) <= math.pi / 2:
                         x = math.sin(ang) * dist
