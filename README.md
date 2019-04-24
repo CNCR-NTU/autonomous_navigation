@@ -20,10 +20,10 @@ http://wiki.ros.org/Robots/SummitXL
 
 * Summit_XL (Installed and Configured with your PC)
 
-See Step 1 for help with any requirements not met.
+*See Step 1 for help with any requirements not met.*
 
 ## Step 1: Install ROS Kinetic and Configure Summit_XL
-Skip if all requirements are met
+*Skip if all requirements are met*
 
 For help installing Ubuntu 16.04 consult the [Offical Install Page](http://releases.ubuntu.com/16.04/)
 
