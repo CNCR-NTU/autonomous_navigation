@@ -29,7 +29,7 @@ For help installing Ubuntu 16.04 consult the [Offical Install Page](http://relea
 
 For help installing ROS Kinetic consult the [ROS Wiki](http://wiki.ros.org/kinetic/Installation/Ubuntu).
 
-For help setting up the Summit_XL on Ubuntu version 16.04 consult the documentation in the repository.
+For help setting up the Summit_XL on Ubuntu version 16.04 consult the [documentation in the repository](Documentation/SummitXL_Ubuntu16.04_Install_Guide.pdf).
 
 For help configuring your Summit_XL with your computer consult the tutorial on the [CNCR Summit Wiki](https://github.com/CNCR-NTU/summitxl).
 
