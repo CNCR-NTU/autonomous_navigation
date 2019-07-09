@@ -6,12 +6,6 @@ This repository hosts all source code for providing autonomous navigation functi
 
 http://wiki.ros.org/Robots/SummitXL
 
-## Contributors
-
-* Josh Paveley <joshpaveley@gmail.com>
-
-* Pedro Machado <pedro.baptistamachado@ntu.ac.uk>
-
 ## Requirements:
 
 * Ubuntu 16.04 (Installed and Configured)
@@ -131,4 +125,15 @@ Launches packages that monitor the stage of the system.
 ```
 $ roslaunch autonomous_navigation Monitor_System.launch
 ```
+
+## Contributors
+
+* Josh Paveley <joshpaveley@gmail.com>
+
+* Jack Bonnell <theBarnWalgrave@gmail.com>
+
+* Pedro Machado <pedro.baptistamachado@ntu.ac.uk>
+
+##Troubleshooting
+Please visit Robotnik [github](https://github.com/RobotnikAutomation)
 2018 (c) Computational Neurosciences and Cognitive Robotics Lab - Nottingham Trent University
