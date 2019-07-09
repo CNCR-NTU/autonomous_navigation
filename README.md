@@ -134,6 +134,7 @@ $ roslaunch autonomous_navigation Monitor_System.launch
 
 * Pedro Machado <pedro.baptistamachado@ntu.ac.uk>
 
-##Troubleshooting
-Please visit Robotnik [github](https://github.com/RobotnikAutomation)
-2018 (c) Computational Neurosciences and Cognitive Robotics Lab - Nottingham Trent University
+### Troubleshooting
+* Please visit Robotnik [github](https://github.com/RobotnikAutomation)
+
+2019 (c) Computational Neurosciences and Cognitive Robotics Lab - Nottingham Trent University
